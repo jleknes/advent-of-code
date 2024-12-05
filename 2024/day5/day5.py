@@ -1,6 +1,5 @@
 import fileinput
 from typing import List, Tuple, Dict
-from statistics import median
 
 
 def read_input() -> Tuple[Dict[int, List[int]], List[List[int]]]:
@@ -42,20 +41,28 @@ def order_update(ordering_rules: Dict[int, List[int]], update: List[int]) -> Lis
     return sorted(update, key=lambda x: [comparator(x, y) for y in update])
 
 
+def get_middle_element(lst: List[int]) -> int:
+    return lst[len(lst) // 2]
+
+
 def solve_part_two(ordering_rules: Dict[int, List[int]], updates: List[List[int]]):
-    total_sum = sum(
-        median(order_update(ordering_rules, update))
-        for update in updates
-        if not correct_update(ordering_rules, update)
+    print(
+        sum(
+            get_middle_element(order_update(ordering_rules, update))
+            for update in updates
+            if not correct_update(ordering_rules, update)
+        )
     )
-    print(total_sum)
 
 
 def solve_part_one(ordering_rules: Dict[int, List[int]], updates: List[List[int]]):
-    total_sum = sum(
-        median(update) for update in updates if correct_update(ordering_rules, update)
+    print(
+        total_sum=sum(
+            get_middle_element(update)
+            for update in updates
+            if correct_update(ordering_rules, update)
+        )
     )
-    print(total_sum)
 
 
 def main():
