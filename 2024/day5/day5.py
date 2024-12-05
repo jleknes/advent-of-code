@@ -1,69 +1,67 @@
 import fileinput
-from typing import List
+from typing import List, Tuple, Dict
+from statistics import median
 
 
-def read_input() -> List[str]:
-    ordering_rules = []
+def read_input() -> Tuple[Dict[int, List[int]], List[List[int]]]:
+    ordering_rules = {}
     updates = []
     for line in fileinput.input():
         line = line.strip()
-        print(line)
         if "|" in line:
-            ordering_rules.append((int(line.split("|")[0]),int(line.split("|")[1])))
+            key, value = map(int, line.split("|"))
+            ordering_rules.setdefault(key, []).append(value)
         elif "," in line:
-            update = [int(element) for element in line.split(",")]
-            updates.append(update)
-    return ordering_rules, updates    
+            updates.append(list(map(int, line.split(","))))
+    return ordering_rules, updates
 
-def correct_update(ordering_rules, update):
-    for rule in ordering_rules:
-        for i in range(len(update)):
-            for j in range(i, len(update)):
-                if update[i]==rule[1] and update[j]==rule[0]:
-                    return False
-            
-    return True
 
-def custom_comparator(ordering_rules):
+def correct_update(ordering_rules: Dict[int, List[int]], update: List[int]) -> bool:
+    return all(
+        second_element not in ordering_rules
+        or first_element not in ordering_rules[second_element]
+        for i, first_element in enumerate(update)
+        for second_element in update[i + 1 :]
+    )
+
+
+def custom_comparator(ordering_rules: Dict[int, List[int]]):
     def comparator(element1, element2) -> int:
-        for rule in ordering_rules:
-            if element1 == rule[1] and element2 == rule[0]:
-                return -1
-            elif element1 == rule[0] and element2 == rule[1]:
-                return 1
-        return 0
+        if element2 in ordering_rules and element1 in ordering_rules[element2]:
+            return -1
+        elif element1 in ordering_rules and element2 in ordering_rules[element1]:
+            return 1
+        else:
+            return 0
+
     return comparator
 
-def order_update(ordering_rules, update):
+
+def order_update(ordering_rules: Dict[int, List[int]], update: List[int]) -> List[int]:
     comparator = custom_comparator(ordering_rules)
     return sorted(update, key=lambda x: [comparator(x, y) for y in update])
 
-def solve_part_two(ordering_rules, updates):
-    total_sum = 0
-    for update in updates:
-        if not correct_update(ordering_rules, update):
-            ordered_update = order_update(ordering_rules, update)
-            # get middle element of update
-            total_sum += ordered_update[int((len(ordered_update) - 1) / 2)]
-    print(total_sum)
-    return
 
-def solve_part_one(ordering_rules, updates):
-    total_sum=0
-    for update in updates:
-        if correct_update(ordering_rules, update):
-            #get middle element of update
-            total_sum+=update[int((len(update)-1)/2)]
+def solve_part_two(ordering_rules: Dict[int, List[int]], updates: List[List[int]]):
+    total_sum = sum(
+        median(order_update(ordering_rules, update))
+        for update in updates
+        if not correct_update(ordering_rules, update)
+    )
     print(total_sum)
-    return
+
+
+def solve_part_one(ordering_rules: Dict[int, List[int]], updates: List[List[int]]):
+    total_sum = sum(
+        median(update) for update in updates if correct_update(ordering_rules, update)
+    )
+    print(total_sum)
+
 
 def main():
     ordering_rules, updates = read_input()
-    print(ordering_rules)
-    print(updates)
     solve_part_one(ordering_rules, updates)
     solve_part_two(ordering_rules, updates)
-
 
 
 if __name__ == "__main__":
