@@ -3,70 +3,40 @@ from typing import List, Tuple
 import itertools
 
 def read_input() -> List[Tuple[int, List[int]]]:
-    lines = [line.strip() for line in fileinput.input()]
     equations = []
-    for line in lines:
-        value=int(line.split(":")[0].strip())
-        elements = list(map(int, line.split(":")[1].strip().split(" ")))
-        equations.append((value, elements))
+    for line in fileinput.input():
+        value, elements = line.strip().split(":")
+        equations.append((int(value.strip()), list(map(int, elements.strip().split()))))
     return equations
 
-def test_equation(test_result, elements, part:str):
+def test_equation(test_result: int, elements: List[int], part: str) -> bool:
     operator_combinations = generate_operator_combinations(len(elements) - 1, part)
-    # Process each combination of operators with the elements
     for operator_list in operator_combinations:
-        sum=elements[0]
+        result = elements[0]
         for operator, element in zip(operator_list, elements[1:]):
-            if operator=="*":
-                sum*=element
-            elif operator=="+":
-                sum+=element
+            if operator == "*":
+                result *= element
+            elif operator == "+":
+                result += element
             else:
-                sum=int(str(sum)+str(element))
-        
-        if sum==test_result:
-            print(test_result, elements, operator_list)
+                result = int(f"{result}{element}")
+        if result == test_result:
             return True
     return False
 
-def generate_operator_combinations(length: int, task:str) -> List[List[str]]:
-    if task =="PART_ONE":
-        operators = ["+", "*"]
-    else: 
-        operators = ["+", "*", "||"]
+def generate_operator_combinations(length: int, task: str) -> List[List[str]]:
+    operators = ["+", "*"] if task == "PART_ONE" else ["+", "*", "||"]
     return list(itertools.product(operators, repeat=length))
 
-
-def solve_part_one(equations):
-    total_calibration_result = 0
-    for equation in equations:
-        value, elements = equation
-        if test_equation(value,elements,"PART_ONE"):
-            total_calibration_result+=value
-            # Implement the logic to test the equation with the given operators
-        #    pass
+def solve_part(equations: List[Tuple[int, List[int]]], part: str) -> int:
+    total_calibration_result = sum(value for value, elements in equations if test_equation(value, elements, part))
     print(total_calibration_result)
-    return
-
-def solve_part_two(equations):
-    total_calibration_result = 0
-    for equation in equations:
-        value, elements = equation
-        if test_equation(value,elements,"PART_TWO"):
-            total_calibration_result+=value
-            # Implement the logic to test the equation with the given operators
-        #    pass
-    print(total_calibration_result)
-    return
-
+    return total_calibration_result
 
 def main() -> None:
     equations = read_input()
-    print(equations)
-    solve_part_one(equations)
-    solve_part_two(equations)
-   
-
+    solve_part(equations, "PART_ONE")
+    solve_part(equations, "PART_TWO")
 
 if __name__ == "__main__":
     main()
