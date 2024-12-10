@@ -38,13 +38,13 @@ def score(grid: List[List[int]], start_point: Tuple[int, int], part: str) -> int
     return len(targets_reached) if part == "ONE" else score
 
 
-def get_start_points(grid):
-    start_points = []
-    for y in range(len(grid)):
-        for x in range(len(grid[y])):
-            if grid[y][x] == 0:
-                start_points.append((y, x))
-    return start_points
+def get_start_points(grid: List[List[int]]) -> List[Tuple[int, int]]:
+    return [
+        (y, x)
+        for y, row in enumerate(grid)
+        for x, value in enumerate(row)
+        if value == 0
+    ]
 
 
 def solve_part_one(grid):
