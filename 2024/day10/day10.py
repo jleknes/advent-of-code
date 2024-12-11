@@ -1,13 +1,12 @@
 import fileinput
-from typing import List, Set, Tuple
 from collections import deque
 
 
-def read_input() -> List[List[int]]:
+def read_input() -> list[list[int]]:
     return [[int(x) for x in line.strip()] for line in fileinput.input()]
 
 
-def move(y: int, x: int, direction: str) -> Tuple[int, int]:
+def move(y: int, x: int, direction: str) -> tuple[int, int]:
     moves = {
         "NORTH": (-1, 0),
         "EAST": (0, 1),
@@ -18,10 +17,10 @@ def move(y: int, x: int, direction: str) -> Tuple[int, int]:
     return y + dy, x + dx
 
 
-def score(grid: List[List[int]], start_point: Tuple[int, int], part: str) -> int:
+def score(grid: list[list[int]], start_point: tuple[int, int], part: str) -> int:
     q = deque([start_point])
     score = 0
-    targets_reached: Set[Tuple[int, int]] = set()
+    targets_reached: set[tuple[int, int]] = set()
 
     while q:
         y, x = q.popleft()
@@ -38,7 +37,7 @@ def score(grid: List[List[int]], start_point: Tuple[int, int], part: str) -> int
     return len(targets_reached) if part == "ONE" else score
 
 
-def get_start_points(grid: List[List[int]]) -> List[Tuple[int, int]]:
+def get_start_points(grid: list[list[int]]) -> list[tuple[int, int]]:
     return [
         (y, x)
         for y, row in enumerate(grid)

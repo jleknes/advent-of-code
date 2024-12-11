@@ -1,9 +1,8 @@
 import fileinput
-from typing import List
 import functools
 
 
-def read_input() -> List[int]:
+def read_input() -> list[int]:
     return [int(x) for x in next(fileinput.input()).strip().split()]
 
 
