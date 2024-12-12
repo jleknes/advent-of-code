@@ -1,9 +1,11 @@
 import fileinput
 
+
 def read_input() -> list[str]:
     return [line.strip() for line in fileinput.input()]
 
-def neighbours(y: int, x: int, gridsize) -> tuple[int, int]:
+
+def neighbouring_points(y: int, x: int):
     moves = {
         "NORTH": (-1, 0),
         "EAST": (0, 1),
@@ -13,27 +15,71 @@ def neighbours(y: int, x: int, gridsize) -> tuple[int, int]:
     neighbours = []
     for direction in moves.keys():
         dy, dx = moves[direction]
-        if 0 <= (y + dy) <= gridsize and 0 <= (x + dx) <= gridsize:
-            neighbours.append((y + dy, x + dx))
+        neighbours.append((y + dy, x + dx))
     return neighbours
+
+
+def neighbours(y: int, x: int, gridsize):
+    for point in neighbouring_points(y, x):
+        ny, nx = point  # Unpack for clarity
+        if 0 <= ny < gridsize and 0 <= nx < gridsize:
+            yield (ny, nx)
 
 
 def calculate_border(region, gridsize):
     # for each point, check if there are neighbours in all directions
     # if no neighbour, that is a fence.
     # dont look at fences as points, but as a point and a direction
-    fences=set()
-    for (y,x) in region:
-        for neighbours in neighbours(y,x,gridsize):
+    fences = []
+    for y, x in region:
+        for neighbour in neighbouring_points(y, x):
             if neighbour not in region:
-                fences.add(neighbour)
+                fences.append(neighbour)
+    return fences
+
+
+def find_region(grid, start):
+    region = set()
+    region.add(start)
+    queue = [start]
+    region_id = grid[start[0]][start[1]]
+    while queue:
+        y, x = queue.pop(0)
+        for neighbour in neighbours(y, x, len(grid)):
+            if (
+                neighbour not in region
+                and grid[neighbour[0]][neighbour[1]] == region_id
+            ):
+                queue.append(neighbour)
+                region.add(neighbour)
+    return region
+
 
 def solve_part_one(grid):
+    gridsize = len(grid)
     regions = []
-    for i, c in enumerate(grid):
-        for j, c in enumerate(grid[i]):
-            print(j,c)
-    print(grid)
+    visited = set()
+    for y in range(gridsize):
+        for x in range(gridsize):
+            if (y, x) not in visited:
+                region = find_region(grid, (y, x))
+                regions.append(region)
+                visited.update(region)
+    price = 0
+    for region in regions:
+        border = calculate_border(region, gridsize)
+        price += len(border) * len(region)
+        # print region in a grid
+        """for y in range(gridsize):
+            for x in range(gridsize):
+                if (y, x) in region:
+                    print("O", end="")
+                else:
+                    print(".", end="")
+            print()
+        print()"""
+    print(price)
+
 
 def solve_part_two(grid):
     print(grid)
@@ -42,7 +88,7 @@ def solve_part_two(grid):
 def main() -> None:
     grid = read_input()
     solve_part_one(grid)
-    #solve_part_two(grid)
+    # solve_part_two(grid)
 
 
 if __name__ == "__main__":
