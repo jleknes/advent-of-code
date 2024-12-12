@@ -20,16 +20,12 @@ def neighbouring_points(y: int, x: int):
 
 
 def neighbours(y: int, x: int, gridsize):
-    for point in neighbouring_points(y, x):
-        ny, nx = point  # Unpack for clarity
+    for ny, nx in neighbouring_points(y, x):
         if 0 <= ny < gridsize and 0 <= nx < gridsize:
             yield (ny, nx)
 
 
-def calculate_border(region, gridsize):
-    # for each point, check if there are neighbours in all directions
-    # if no neighbour, that is a fence.
-    # dont look at fences as points, but as a point and a direction
+def calculate_border(region):
     fences = []
     for y, x in region:
         for neighbour in neighbouring_points(y, x):
@@ -67,7 +63,7 @@ def solve_part_one(grid):
                 visited.update(region)
     price = 0
     for region in regions:
-        border = calculate_border(region, gridsize)
+        border = calculate_border(region)
         price += len(border) * len(region)
         # print region in a grid
         """for y in range(gridsize):
