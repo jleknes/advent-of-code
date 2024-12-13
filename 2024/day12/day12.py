@@ -63,34 +63,57 @@ def border_cost(border):
     # All squares with more than one point is a cross.
     # change data structure?
     remaining_points = list(border)
-    (y, x) = remaining_points[0]
-    remaining_points.remove((y,x))
-    price=1
+    print(remaining_points)
     #current_fence = [(y,x)]
-
+    price=0
     while remaining_points:
-        # check all neighbours. If there is a neighbouring border,
-        # check all neighbours in both directions on the same line. do so until
-        # no more neighbours in those directions.
-        # of we have to turn, start a new "collection"
-        neighbours = neighbouring_points(y, x)
-        for neighbour in neighbours:
-            if neighbour in remaining_points:
-                remaining_points.remove(neighbour)
-                if neighbour[0]!=y:
-                    #look for vertical points
-                else:
-                    #look for horizontal points
-                break
         (y, x) = remaining_points[0]
         remaining_points.remove((y,x))
         price+=1
 
+        print("starting at ", y, x)
+        # check all neighbours. If there is a neighbouring border,
+        # check all neighbours in both directions on the same line. do so until
+        # no more neighbours in those directions.
+        neigbours = neighbouring_points(y, x)
+        for neighbour in neigbours:
+            if neighbour in remaining_points:
+                print(neighbour)
+                remaining_points.remove(neighbour)
+                if neighbour[0]!=y:
+                    low_y=min(y, neighbour[0])
+                    high_y=max(y, neighbour[0])                
+                    changed = True
+                    while changed:
+                        changed = False
+                        if (low_y-1,x) in remaining_points:                            
+                            remaining_points.remove((low_y-1,x))
+                            low_y-=1
+                            changed = True
+                        if (high_y+1,x) in remaining_points:
+                            remaining_points.remove((high_y+1,x))
+                            high_y+=1
+                            changed = True                
+                else:
+                    changed = True
+                    low_x=min(x, neighbour[1])
+                    high_x=max(x, neighbour[1])
+                    while changed:
+                        changed = False
+                        if (y, low_x-1) in remaining_points:
+                            remaining_points.remove((y, low_x-1))
+                            low_x-=1
+                            changed = True
+                        if (y, high_x+1) in remaining_points:
+                            remaining_points.remove((y, high_x+1))
+                            high_x+=1
+                            changed = True
         # for neighbour in remaining_points:
         #    if neighbour in
     return price
 
 def solve_part_one(grid):
+
     gridsize = len(grid)
     regions = []
     visited = set()
@@ -119,13 +142,29 @@ def solve_part_one(grid):
 
 
 def solve_part_two(grid):
-    print(grid)
+    print("part two")
+    gridsize = len(grid)
+    regions = []
+    visited = set()
+    for y in range(gridsize):
+        for x in range(gridsize):
+            if (y, x) not in visited:
+                region = find_region(grid, (y, x))
+                regions.append(region)
+                visited.update(region)
+    price = 0
+    for region in regions:
+        border = calculate_border(region)
+        cost = border_cost(border)
+        price+=len(region)*cost
+        print("region size: ", len(region), " number of sides: ",cost, " price: ",len(region)*cost)
+    print(price)
 
 
 def main() -> None:
     grid = read_input()
     solve_part_one(grid)
-    # solve_part_two(grid)
+    solve_part_two(grid)
 
 
 if __name__ == "__main__":
