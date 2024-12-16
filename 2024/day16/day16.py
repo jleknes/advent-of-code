@@ -18,7 +18,7 @@ def move(y: int, x: int, direction: str) -> tuple[int, int]:
     return y + dy, x + dx
 
 
-def rotate(direction: str, clockwise: int) -> str:
+def rotate(direction: str, clockwise: bool) -> str:
     directions = ["UP", "RIGHT", "DOWN", "LEFT"]
     index = directions.index(direction)
     if clockwise:
@@ -36,10 +36,6 @@ def solve_part_one(grid):
                 start = (y, x)
             elif square == "E":
                 end = (y, x)
-            if start and end:
-                break
-        if start and end:
-            break
 
     q = deque()
     q.append((*start, "RIGHT", 0))
