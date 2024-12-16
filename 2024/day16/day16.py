@@ -91,7 +91,7 @@ def solve_part_two(grid):
     def get_next_states(y, x, direction, cost, current_path):
         next_states = []
         ny, nx = move(y, x, direction)
-        if 0 <= ny < len(grid) and 0 <= nx < len(grid[0]) and grid[ny][nx] != "#":
+        if grid[ny][nx] != "#":
             next_states.append((ny, nx, direction, cost + 1, current_path | {(ny, nx)}))
         for new_direction in (rotate(direction, True), rotate(direction, False)):
             next_states.append((y, x, new_direction, cost + 1000, current_path))
@@ -126,13 +126,6 @@ def solve_part_two(grid):
             winning_path = paths[key]
             break
     print(len(winning_path))
-    for y, row in enumerate(grid):
-        for x, square in enumerate(row):
-            if (y, x) in winning_path:
-                print("\u001b[94mO\033[0m", end="")
-            else:
-                print(square, end="")
-        print()
 
 
 def main() -> None:
