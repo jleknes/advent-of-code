@@ -5,14 +5,14 @@ def read_input() -> list[str]:
     return [line.strip() for line in fileinput.input()]
 
 
-def max_joltage(bank: str, length: int) -> int:
+def max_joltage(bank: str, batteries: int) -> int:
     joltage_digits = []
     position = 0
-    while len(joltage_digits) < length:
+    while len(joltage_digits) < batteries:
         for digit in range(9, -1, -1):
             str_digit = str(digit)
             digit_pos = bank.find(str_digit, position)
-            remaining_needed = length - len(joltage_digits) - 1
+            remaining_needed = batteries - len(joltage_digits) - 1
             if digit_pos != -1 and len(bank) - digit_pos - 1 >= remaining_needed:
                 joltage_digits.append(str_digit)
                 position = digit_pos + 1
